@@ -1,0 +1,323 @@
+:root {
+    --bg-color: #0f172a;
+    --sidebar-bg: rgba(30, 41, 59, 0.7);
+    --card-bg: rgba(51, 65, 85, 0.5);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-color: #3b82f6;
+    --up-color: #26a69a;
+    --down-color: #ef5350;
+    --font-main: 'Inter', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+.sidebar {
+    width: 340px;
+    background-color: var(--sidebar-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.glow-text {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(to right, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+    margin-bottom: 8px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.card h2 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.balance-display {
+    display: flex;
+    align-items: baseline;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.currency {
+    font-size: 20px;
+    color: var(--text-secondary);
+    margin-right: 4px;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.status-row:last-child {
+    margin-bottom: 0;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge.long { background-color: rgba(38, 166, 154, 0.2); color: var(--up-color); }
+.badge.short { background-color: rgba(239, 83, 80, 0.2); color: var(--down-color); }
+.badge.neutral { background-color: rgba(148, 163, 184, 0.2); color: var(--text-secondary); }
+
+.profit { color: var(--up-color); }
+.loss { color: var(--down-color); }
+
+.logs-card {
+    flex: 1;
+    min-height: 200px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#trade-logs {
+    list-style: none;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+#trade-logs::-webkit-scrollbar {
+    width: 4px;
+}
+
+#trade-logs::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.log-item {
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid transparent;
+}
+
+.log-item.buy { border-left-color: var(--up-color); }
+.log-item.sell { border-left-color: var(--down-color); }
+
+.log-time {
+    color: var(--text-secondary);
+    font-size: 10px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.form-group select,
+.form-group input {
+    background-color: rgba(15, 23, 42, 0.6);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: var(--font-main);
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.form-group input {
+    cursor: text;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    border-color: var(--accent-color);
+}
+
+.mt-2 {
+    margin-top: 16px;
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+}
+
+.primary-btn, .secondary-btn {
+    flex: 1;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.secondary-btn {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.secondary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.primary-btn:active, .secondary-btn:active {
+    transform: translateY(0);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--card-bg);
+    position: relative;
+}
+
+#tvchart {
+    flex: 2;
+    position: relative;
+    width: 100%;
+}
+
+#volume-chart {
+    flex: 0.5;
+    position: relative;
+    width: 100%;
+}
+
+.chart-divider {
+    height: 4px;
+    background-color: var(--bg-color);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: row-resize;
+}
+
+.custom-crosshair {
+    position: absolute;
+    top: 0;
+    bottom: 26px; /* 避開底部的時間軸 */
+    width: 1px;
+    border-left: 1px dashed #758696;
+    pointer-events: none;
+    display: none;
+    z-index: 10;
+}
+
+#pnl-chart {
+    flex: 1;
+    position: relative;
+    width: 100%;
+}
+
+.chart-legend {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 20;
+    font-size: 14px;
+    font-weight: 600;
+    background: rgba(15, 23, 42, 0.7);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: color 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cost-text {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.tv-lightweight-charts {
+    border-radius: 16px;
+}

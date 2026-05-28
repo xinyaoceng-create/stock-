@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動態股市策略模擬 (S&P 500)</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <h1 class="glow-text">Trading<br>Strategy</h1>
+
+            <div class="card settings-card">
+                <h2>模擬設定 (Settings)</h2>
+                <div class="form-group">
+                    <label>投資標的</label>
+                    <select id="asset-select">
+                        <option value="0050">0050 (台灣50)</option>
+                        <option value="sp500" selected>標普500 (S&P 500)</option>
+                        <option value="tsmc">台積電 (2330)</option>
+                        <option value="00631L">00631L (正2)</option>
+                        <option value="nvda">輝達 (NVDA)</option>
+                        <option value="tsla">特斯拉 (TSLA)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>模擬期間</label>
+                    <select id="sim-years-select">
+                        <option value="1">1 年 (約 252 交易日)</option>
+                        <option value="3">3 年 (約 756 交易日)</option>
+                        <option value="5" selected>5 年 (約 1260 交易日)</option>
+                        <option value="10">10 年 (約 2520 交易日)</option>
+                        <option value="20">20 年 (約 5040 交易日)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>交易策略</label>
+                    <select id="strategy-select">
+                        <option value="dca" selected>定期定額</option>
+                        <option value="dca_relative_high">定期定額+逢低加碼</option>
+                        <option value="gump">阿甘投資法 (大跌抄底)</option>
+                        <option value="buy_dip">波段低點投入 (創新高後回檔)</option>
+                        <option value="ma_cross">雙均線交叉 (全壓全出)</option>
+                        <option value="allin">All In (單筆投入)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="base-amount-group">
+                    <label>單次投入金額 ($)</label>
+                    <input type="number" id="base-amount-input" value="20000" min="1000" step="1000">
+                </div>
+                <div class="form-group" id="dca-freq-group">
+                    <label>定期定額頻率</label>
+                    <select id="dca-freq-select">
+                        <option value="5">每週 (5交易日)</option>
+                        <option value="20" selected>每月 (20交易日)</option>
+                        <option value="60">每季 (60交易日)</option>
+                    </select>
+                </div>
+                <div class="button-group mt-2">
+                    <button id="start-sim-btn" class="primary-btn">重新開始</button>
+                    <button id="toggle-sim-btn" class="secondary-btn">暫停</button>
+                </div>
+                <div class="speed-display" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px; color: #a0aec0; font-size: 0.9em; font-weight: 600;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>播放速度</span>
+                        <span><span id="speed-indicator">1.00</span>x</span>
+                    </div>
+                    <input type="range" id="speed-slider" min="0.25" max="10.0" step="0.25" value="1.00" style="width: 100%; cursor: pointer; accent-color: #3b82f6;">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>帳戶資金 (Portfolio)</h2>
+                <div class="balance-display">
+                    <span class="currency">$</span>
+                    <span id="account-balance">100,000.00</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>策略狀態 (<span id="strategy-name-display">定期定額</span>)</h2>
+                <div class="status-row">
+                    <span>目前持倉:</span>
+                    <span id="current-position" class="badge neutral">空手 (0)</span>
+                </div>
+                <div class="status-row">
+                    <span>總持有成本:</span>
+                    <span id="total-cost" class="neutral">$0.00</span>
+                </div>
+                <div class="status-row">
+                    <span>未實現損益:</span>
+                    <span id="unrealized-pnl" class="neutral">$0.00</span>
+                </div>
+                <div class="status-row">
+                    <span>總資產:</span>
+                    <span id="total-equity">$100,000.00</span>
+                </div>
+            </div>
+
+            <div class="card logs-card">
+                <h2>交易日誌 (Logs)</h2>
+                <ul id="trade-logs">
+                    <!-- Logs will appear here -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="tvchart">
+                <div id="crosshair-top" class="custom-crosshair"></div>
+            </div>
+            <div class="chart-divider"></div>
+            <div id="volume-chart">
+                <div id="crosshair-volume" class="custom-crosshair"></div>
+            </div>
+            <div class="chart-divider"></div>
+            <div id="pnl-chart">
+                <div id="crosshair-bottom" class="custom-crosshair"></div>
+                <div class="chart-legend">
+                    <div id="pnl-legend">PnL: $0.00 (0.00%)</div>
+                    <div id="cost-legend" class="cost-text">持有成本: $0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="main.js?v=5"></script>
+</body>
+
+</html>
