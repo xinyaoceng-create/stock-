@@ -389,7 +389,7 @@ async function startSimulationWithNewData() {
         const asset = assetSelect.value;
         const years = parseInt(simYearsSelect.value) || 5;
         const historyCount = 100; // 先在圖表上保留 100 天的 K 線以供參考
-        const requiredCount = years * 252; // 模擬所需天數
+        let requiredCount = years * 252; // 模擬所需天數
 
         let allCandles = await loadAssetData(asset);
 
@@ -407,6 +407,39 @@ async function startSimulationWithNewData() {
             }
             if (count20 === 20) allCandles[i].sma20 = sum20 / 20;
             if (count60 === 60) allCandles[i].sma60 = sum60 / 60;
+        }
+
+        if (simYearsSelect.value === 'max') {
+            requiredCount = allCandles.length - historyCount;
+        } else if (simYearsSelect.value === '2007_high') {
+            const isTw = ['0050', 'tsmc', '00631L'].includes(assetSelect.value);
+            const targetDateStr = isTw ? '2007-10-30' : '2007-10-09';
+            let startIndex = 0;
+            for (let i = 0; i < allCandles.length; i++) {
+                let d = allCandles[i].time;
+                let dStr = '';
+                if (typeof d === 'number') {
+                    const date = new Date(d * 1000);
+                    const yyyy = date.getFullYear();
+                    const mm = String(date.getMonth() + 1).padStart(2, '0');
+                    const dd = String(date.getDate()).padStart(2, '0');
+                    dStr = `${yyyy}-${mm}-${dd}`;
+                } else if (typeof d === 'string') {
+                    dStr = d.replace(/\//g, '-');
+                } else if (d && d.year) {
+                    dStr = `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`;
+                }
+                
+                if (dStr >= targetDateStr) {
+                    startIndex = i;
+                    break;
+                }
+            }
+            if (startIndex > historyCount) {
+                requiredCount = allCandles.length - startIndex;
+            } else {
+                requiredCount = allCandles.length - historyCount;
+            }
         }
 
         // 擷取指定年份的回測區間
@@ -486,10 +519,13 @@ function resetSimulation() {
         upColor: '#26a69a', downColor: '#ef5350', borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350',
     });
 
+    const isTw = ['0050', 'tsmc', '00631L'].includes(assetSelect.value);
     volumeSeries = addHistogramSeriesHelper(volumeChart, {
         color: '#26a69a',
         priceFormat: { type: 'volume' },
     });
+    const volLabel = document.getElementById('volume-unit-label');
+    if (volLabel) volLabel.innerText = isTw ? '單位: 張' : '單位: 股';
 
     sma20Series = addLineSeriesHelper(chart, { color: '#4caf50', lineWidth: 2, crosshairMarkerVisible: false });
     sma60Series = addLineSeriesHelper(chart, { color: '#2196f3', lineWidth: 2, crosshairMarkerVisible: false });
@@ -516,9 +552,11 @@ function resetSimulation() {
 
     const sma20Data = originalInitialData.filter(c => c.sma20 !== undefined).map(c => ({ time: c.time, value: c.sma20 }));
     const sma60Data = originalInitialData.filter(c => c.sma60 !== undefined).map(c => ({ time: c.time, value: c.sma60 }));
+    const isTwStock = ['0050', 'tsmc', '00631L'].includes(assetSelect.value);
+    const volDiv = isTwStock ? 1000 : 1;
     const volumeData = originalInitialData.filter(c => c.volume !== undefined).map(c => ({
         time: c.time,
-        value: c.volume,
+        value: c.volume / volDiv,
         color: c.close >= c.open ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)'
     }));
 
@@ -729,12 +767,12 @@ function processStrategy(candle) {
         }
     }
     else if (strategy === 'dca') {
-        if (daysPassed % freq === 0) {
+        if ((daysPassed - 1) % freq === 0) {
             executeBuy(baseAmount, price, candle.time, '定期定額');
         }
     }
     else if (strategy === 'gump') {
-        if (daysPassed % freq === 0) {
+        if ((daysPassed - 1) % freq === 0) {
             const drawdown = (allTimeHigh - price) / allTimeHigh;
             let multiplier = 1;
             let reason = '阿甘買入';
@@ -778,7 +816,7 @@ function processStrategy(candle) {
         }
     }
     else if (strategy === 'dca_relative_high') {
-        if (daysPassed % freq === 0) {
+        if ((daysPassed - 1) % freq === 0) {
             executeBuy(baseAmount, price, candle.time, '定期定額');
         }
 
@@ -866,9 +904,10 @@ function tick(timestamp) {
         });
 
         if (candle.volume !== undefined && volumeSeries) {
+            const isTw = ['0050', 'tsmc', '00631L'].includes(assetSelect.value);
             volumeSeries.update({
                 time: candle.time,
-                value: candle.volume,
+                value: candle.volume / (isTw ? 1000 : 1),
                 color: candle.close >= candle.open ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)'
             });
         }

@@ -37,6 +37,8 @@
                         <option value="5" selected>5 年 (約 1260 交易日)</option>
                         <option value="10">10 年 (約 2520 交易日)</option>
                         <option value="20">20 年 (約 5040 交易日)</option>
+                        <option value="max">全歷史資料</option>
+                        <option value="2007_high">2007年高點 (金融海嘯前)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -116,8 +118,9 @@
                 <div id="crosshair-top" class="custom-crosshair"></div>
             </div>
             <div class="chart-divider"></div>
-            <div id="volume-chart">
+            <div id="volume-chart" style="position: relative;">
                 <div id="crosshair-volume" class="custom-crosshair"></div>
+                <div id="volume-unit-label" style="position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: bold; pointer-events: none;"></div>
             </div>
             <div class="chart-divider"></div>
             <div id="pnl-chart">

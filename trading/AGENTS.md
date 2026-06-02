@@ -18,8 +18,9 @@
 - `fetch_data.py`: 更新歷史資料的 Python 腳本。
 - `plot_candle.py`: 產生靜態 K 線圖（如 `0050_candle_chart.png`）的 Python 腳本。
 
-## 歷史資料處理特別規則 (Yahoo Finance)
-- 針對 **0050 (0050.TW)**：若其在 2013 年最後一個交易日的股價大概為 2014 年第一個交易日股價的 4 倍，代表可能有未還原的分割。此時需針對 2013 年 (含) 以前的所有資料進行修正：股價 (Open, High, Low, Close) 除以 4，成交量 (Volume) 乘以 4。此修正邏輯已實作於 `fetch_data.py`。
+## 歷史資料處理特別規則
+- **0050 (0050.TW)**：因 Yahoo Finance 在 2014 年前後有錯誤的分割紀錄，故已改為透過 `FinMind` 直接向台灣證交所 (TWSE) 抓取正確的原始歷史資料，不再使用人工除以 4 的方式修正。
+- 其他資產：仍維持使用 `yfinance` 抓取 Yahoo Finance 的資料。
 
 ## 交易策略 (定義於 `main.js`)
 目前實作的策略包含：
